@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>实验</title>
+    <!-- 加载必要的脚本库 -->
     <script>console.log("开始加载库...")</script>
     <script src="jspsych.js" type="text/javascript"></script>
     <script src="jspsych-html-keyboard-response.js"></script>
@@ -22,30 +23,80 @@
             background-color: #f0f0f0; /* 背景色 */
             display: inline-block;
         }
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .header, .footer {
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            padding: 10px;
+        }
+        .content {
+            display: flex;
+            flex: 1;
+            flex-direction: row;
+        }
+        .sidebar {
+            background-color: #f4f4f4;
+            width: 200px;
+            padding: 10px;
+        }
+        .main {
+            background-color: #fff;
+            flex: 1;
+            padding: 10px;
+        }
     </style>
 </head>
 <body onload="initExp()">
-    <div id="display_stage_background"></div>
-    <div id="display_stage"></div>
-    <div>
-        <span style="font-size: 12pt;">
-            实验正在加载...
-            <br><br>
-            如果此消息显示超过 <span style="color: rgb(255, 0, 0);"><b>10秒</b></span>，请联系 <a href="mailto: 2205465509@qq.com">addyouremailhere</a>。对给您带来的不便表示抱歉，感谢您的参与。
-        </span>
+    <!-- 实验加载界面 -->
+    <div class="container">
+        <div class="header">N-BACK实验</div>
+        <div class="content">
+            <div class="sidebar">
+                <h2>实验步骤</h2>
+                <ol>
+                    <li>请确保您的电脑有良好的网络连接。</li>
+                    <li>点击“全屏”按钮以进入全屏模式。</li>
+                    <li>阅读每个任务的指示并点击“继续”开始任务。</li>
+                    <li>在任务中，根据指示按下相应的键。</li>
+                    <li>任务结束后，屏幕会退出全屏模式。</li>
+                </ol>
+            </div>
+            <div class="main">
+                <div id="display_stage_background"></div>
+                <div id="display_stage"></div>
+                <div>
+                    <span style="font-size: 12pt;">
+                        实验正在加载...
+                        <br><br>
+                        如果此消息显示超过 <span style="color: rgb(255, 0, 0);"><b>10秒</b></span>，请联系 <a href="mailto: 2205465509@qq.com">addyouremailhere</a>。对给您带来的不便表示抱歉，感谢您的参与。
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="footer">实验结束后请点击“完成”按钮以提交数据。</div>
     </div>
+
 </body>
 <script lang="javascript">
+/* 初始化实验函数 */
 function initExp() {
-    var StimDuration = 1500;
-    var ISIDuration = 500;
-    var nItemsTotal = 30;
-    var nItemsTarget = 10;
-    var nLeadingDisttr = 3;
-    var currentnback = 0;
-    var MaxError = 24;
-    var currentTrial = 0;
-    var nstim = 15;
+    // 实验参数设置
+    var StimDuration = 1500; // 刺激显示时间
+    var ISIDuration = 500; // 刺激间隔时间
+    var nItemsTotal = 30; // 总刺激数量
+    var nItemsTarget = 10; // 目标刺激数量
+    var nLeadingDisttr = 3; // 前导干扰项数量
+    var currentnback = 0; // 当前n-back任务
+    var MaxError = 24; // 最大错误数
+    var currentTrial = 0; // 当前试次
+    var nstim = 15; // 刺激项目数量
+
+    // 刺激列表
     var ListOfStimuli = [
         '<p class="stimulus" style="color: red;">A</p>',
         '<p class="stimulus" style="color: blue;">B</p>',
@@ -64,6 +115,7 @@ function initExp() {
         '<p class="stimulus" style="color: turquoise;">X</p>'
     ];
 
+    // 全屏设置
     var FullScreenOn = {
         type: "fullscreen",
         message: "<p>当你按下按钮时，屏幕将进入全屏模式...</p>",
@@ -75,34 +127,42 @@ function initExp() {
         fullscreen_mode: false
     };
 
+    // 结束界面
     var Show_Bye = {
         type: "html-button-response",
         stimulus: "<p>感谢您完成本任务！</p>",
         choices: ["继续"]
     };
 
+    // 准备界面
     var Show_Ready = {
         type: "html-button-response",
         stimulus: "<p>您现在可以继续任务了！</p><p>提示：本研究包含3个任务：首先，您需要确定当前字母是否与<b>前一个字母</b>相同，然后是<b>前两个字母</b>，最后是<b>前三个字母</b>。在这些任务中，您将不会听到是否回答正确的声音提示。如果您错过了一些项目，请继续进行，尽力而为！</p><p>选择继续以开始。</p>",
         choices: ["继续"]
     };
 
+    // 1-back任务说明
     var Show_Instr_OneBack = {
         type: "html-button-response",
         stimulus: "<p>在这个任务中，您需要指出当前显示的字母是否与<b>前一个字母</b>相同。在练习阶段，字母消失后会有声音提示您是否回答正确。</p><p>点击继续开始<b>前一个字母</b>序列</p>",
         choices: ["继续"]
     };
+
+    // 2-back任务说明
     var Show_Instr_TwoBack = {
         type: "html-button-response",
         stimulus: "<p>您现在可以进行下一个任务了！请指出当前显示的字母是否与<b>前两个字母</b>相同，尽快按空格键。</p><p>点击继续开始<b>前两个字母</b>序列。</p>",
         choices: ["继续"]
     };
+
+    // 3-back任务说明
     var Show_Instr_ThreeBack = {
         type: "html-button-response",
         stimulus: "<p>您现在可以进行下一个任务了！请指出当前显示的字母是否与<b>前三个字母</b>相同，尽快按空格键。</p><p>点击继续开始<b>前三个字母</b>序列。</p>",
         choices: ["继续"]
     };
 
+    // 创建一个数组并填充指定值
     function fillArray(value, len) {
         var arr = [];
         for (var i = 0; i < len; i++) {
@@ -110,6 +170,8 @@ function initExp() {
         }
         return arr;
     }
+
+    // 打乱数组顺序
     function shuffle(array) {
         var currentIndex = array.length, temporaryValue, randomIndex;
         while (0 !== currentIndex) {
@@ -121,6 +183,8 @@ function initExp() {
         }
         return array;
     }
+
+    // 创建试次
     function createTrials(ntarget, ndistractor) {
         var distractors = fillArray("distractor", ndistractor - nLeadingDisttr);
         var headdisttrs = fillArray("distractor", nLeadingDisttr);
@@ -130,6 +194,8 @@ function initExp() {
         total = headdisttrs.concat(total);
         return total;
     }
+
+    // 更改数组中元素的大小写
     function altercase(ArrayStimuli) {
         var i = 0;
         var result = ArrayStimuli;
@@ -142,6 +208,8 @@ function initExp() {
         }
         return result;
     }
+
+    // 创建运行对象
     function createObjectsToRun(condBlock, n) {
         var stimArray = [];
         var i = 0;
@@ -173,11 +241,14 @@ function initExp() {
         console.log("createObjectsToRun 返回 ", stimArray);
         return altercase(stimArray);
     }
+
+    // 生成随机试次
     var randomtrials = createTrials(nItemsTarget, nItemsTotal - nItemsTarget);
     var BackArray = createObjectsToRun(randomtrials, 1);
     var randomtrials = createTrials(4, 6);
     var PractArray = createObjectsToRun(randomtrials, 1);
 
+    // 显示刺激
     var ShowStimulus = {
         type: "html-keyboard-response",
         stimulus: function () {
@@ -196,6 +267,7 @@ function initExp() {
         response_ends_trial: false,
     };
 
+    // 设置练习数组
     var Set_PracticeArray = {
         type: "call-function",
         func: function () {
@@ -206,14 +278,17 @@ function initExp() {
         },
     };
 
+    // 提供反馈
     function Provide_Feedback(trial_data) {
         if (BackArray[currentTrial].condition == "target") {
-            if (trial_data.key_press == 32) {
+            if ( trial_data.key_press == 32) {
                 //snd.play();
             }
         }
         currentTrial += 1;
     }
+
+    // 运行练习
     var Run_Practice = {
         timeline: [ShowStimulus],
         timeline_variables: PractArray,
@@ -223,18 +298,21 @@ function initExp() {
         on_finish: Provide_Feedback,
     };
 
+    // 显示继续按钮
     var Show_Continue = {
         type: "html-button-response",
         stimulus: "<p>准备好再来一次了吗？</p>",
         choices: ["继续"],
     };
 
+    // 询问是否重试
     var Ask_Retry = {
         type: "html-button-response",
         stimulus: "<p>好的练习！</p>",
         choices: ["继续", "再练习一次"],
     }
 
+    // 练习循环
     var Practice_Loop = {
         timeline: [
             Set_PracticeArray,
@@ -247,10 +325,12 @@ function initExp() {
         }
     };
 
+    // 错误计数器
     var mistakeCounter = 0;
     var falsealarmCounter = 0;
     var missCounter = 0;
 
+    // 重置计数器
     var Reset_Counter = {
         type: "call-function",
         func: function () {
@@ -259,6 +339,8 @@ function initExp() {
             missCounter = 0;
         },
     };
+
+    // 设置n-back数组
     var Set_BackArray = {
         type: "call-function",
         func: function () {
@@ -267,6 +349,8 @@ function initExp() {
             BackArray = createObjectsToRun(randomtrials, currentnback);
         },
     };
+
+    // 记录决策
     function Record_Decision(trial_data) {
         var correct;
         var type;
@@ -320,6 +404,8 @@ function initExp() {
             "错误数量 ", mistakeCounter, "; 当前 nback: ", currentnback,
             " (响应类型: ", type, ")");
     }
+
+    // 保存分数
     var Save_Scores = {
         type: "call-function",
         func: function () {
@@ -329,6 +415,8 @@ function initExp() {
                 "nBack".concat(currentnback).concat("MISS"), missCounter.toString());
         },
     }
+
+    // 运行n-back块
     var Run_Block_Back = {
         timeline: [ShowStimulus],
         timeline_variables: BackArray,
@@ -338,6 +426,7 @@ function initExp() {
         on_finish: Record_Decision,
     };
 
+    // 运行一个2-back块
     var OneBlock_TwoBack_Run = {
         timeline: [
             Show_Instr_TwoBack,
@@ -361,6 +450,8 @@ function initExp() {
             return mistakeCounter <= MaxError;
         },
     };
+
+    // 运行一个3-back块
     var OneBlock_ThreeBack_Run = {
         timeline: [
             Show_Instr_ThreeBack,
@@ -385,6 +476,7 @@ function initExp() {
         },
     };
 
+    // 初始化jsPsych
     jsPsych.init({
         timeline: [
             FullScreenOn,
